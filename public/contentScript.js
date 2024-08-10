@@ -1,7 +1,22 @@
+// This flag will be used to track whether the mode is active or not
 if (!window.tagHoverScriptInjected) {
   window.tagHoverScriptInjected = true;
+  window.isActiveMode = true; // Initially, the mode is active
+
+  // Listen for messages to activate or deactivate the mode
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.mode === 'deactivate') {
+      window.isActiveMode = false;
+      // Optionally remove event listeners or any added elements here
+    } else if (request.mode === 'activate') {
+      window.isActiveMode = true;
+    }
+    sendResponse({ status: 'mode updated' });
+  });
 
   document.addEventListener('mouseover', (event) => {
+    if (!window.isActiveMode) return; // Exit if the mode is not active
+
     const targetElement = event.target;
     const tagName = targetElement.tagName;
 
