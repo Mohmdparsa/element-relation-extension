@@ -8,11 +8,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         target: { tabId: tabs[0].id },
         files: ['contentScript.js'],
       });
+      chrome.tabs.sendMessage(tabs[0].id, { mode: 'activate' });
     });
     sendResponse({ message: 'Mode activated' });
   } else if (request.mode === 'deactivate') {
     isActive = false;
-    // Optionally, you can remove the content script here or just stop further actions in it.
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, { mode: 'deactivate' });
+    });
     sendResponse({ message: 'Mode deactivated' });
   }
 });
